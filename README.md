@@ -7,8 +7,7 @@ Instructions to use the link:
 6. 'http://ghcr.io/pathway-catalyst-partners-official/watermark-pathway-catalyst:latest'
 7. Add your 'EMAIL_ADDRESS' and 'EMAIL_PASSWORD' in the environment variables, the email password should be application password - 'generate app password'. 
 8. Hit deploy and access the app through the link
-
-
+9. The email address and app passowrd must be entered by the ISO to safeguard their identity.
 
 
 Powered by Pathway Catalyst
