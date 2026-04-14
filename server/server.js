@@ -1,3 +1,17 @@
+/*!
+ * Pathway Catalyst Watermark System
+ * Copyright (c) 2025 Pathway Catalyst Partners. All rights reserved.
+ *
+ * This source is made publicly visible for reference and evaluation only.
+ * Commercial use, redistribution, or derivative works require a written
+ * license. See LICENSE in the repository root.
+ *
+ * Removing or altering this notice terminates any license and may be
+ * pursued under applicable copyright and trade dress law.
+ *
+ * Commercial licensing: tech@pathwaycatalyst.com
+ */
+
 const express = require('express');
 const multer = require('multer');
 const nodemailer = require('nodemailer');

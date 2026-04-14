@@ -1,0 +1,85 @@
+Pathway Catalyst Partners Proprietary License v1.0
+
+Copyright (c) 2025 Pathway Catalyst Partners. All rights reserved.
+
+1. DEFINITIONS
+
+"Software" means the source code, binaries, Docker images, documentation, and
+any other materials in or derived from this repository, including without
+limitation the published container images at ghcr.io/pathway-catalyst-partners-official/*.
+
+"Licensor" means Pathway Catalyst Partners.
+
+"You" means any individual or entity that accesses, copies, modifies, runs,
+distributes, or otherwise uses the Software.
+
+2. NO LICENSE GRANTED BY DEFAULT
+
+No right, license, or permission of any kind is granted to You by this
+repository being publicly visible on GitHub, being downloadable from GitHub
+Container Registry, or by any other distribution channel. Public availability
+is for reference and evaluation only.
+
+Without a separate written agreement signed by an authorized representative
+of Licensor, You are NOT permitted to:
+
+  (a) copy, fork, mirror, or redistribute the Software;
+  (b) modify or create derivative works;
+  (c) run the Software in production or commercial settings;
+  (d) incorporate any part of the Software into other products, services,
+      or codebases;
+  (e) remove or alter any copyright, attribution, or watermark branding
+      present in the Software or in the output it produces.
+
+3. EVALUATION USE
+
+Solely for the purpose of evaluating whether to request a commercial license,
+You may clone this repository and run the Software in a non-production,
+non-commercial local environment for a period not to exceed thirty (30) days.
+Evaluation use does NOT permit (a) processing documents belonging to third
+parties, (b) integration into any workflow that generates revenue, or (c)
+distribution of the Software or its output to any third party.
+
+4. ATTRIBUTION REQUIREMENT
+
+Any use granted by separate written agreement must preserve in full:
+
+  (a) this LICENSE file;
+  (b) the NOTICE file;
+  (c) the "Powered by Pathway Catalyst" branding in all PDF output;
+  (d) all copyright notices in source files.
+
+Removing or altering any of the above terminates any license immediately
+and without notice.
+
+5. PRIOR UNAUTHORIZED USE
+
+Any prior use of the Software without a written license from Licensor was
+unlicensed and remains unauthorized. Licensor reserves all rights and remedies
+with respect to such use, including injunctive relief and damages.
+
+6. COMMERCIAL LICENSING
+
+To request a commercial license, contact: tech@pathwaycatalyst.com
+
+7. NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL
+LICENSOR BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM
+THE USE OF THE SOFTWARE.
+
+8. TERMINATION
+
+Any breach of this License terminates Your rights under it immediately.
+Licensor may pursue all available legal and equitable remedies, including
+without limitation DMCA takedown notices, injunctive relief, and monetary
+damages.
+
+9. GOVERNING LAW
+
+This License is governed by the laws of the State of Florida, United States,
+without regard to its conflict of laws principles.
+
+END OF LICENSE
