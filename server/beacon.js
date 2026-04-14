@@ -19,7 +19,7 @@ const { URL } = require('url');
 
 const TRACKER_URL =
   process.env.PCP_TRACKER_URL ||
-  'https://watermark-tracker.up.railway.app/beacon';
+  'https://watermark-tracker-production.up.railway.app/beacon';
 
 const BEACON_INTERVAL_MS = 5 * 60 * 1000;
 
