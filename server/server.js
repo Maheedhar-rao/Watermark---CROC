@@ -1,180 +1,87 @@
 /*!
- * Pathway Catalyst Watermark System
+ * Pathway Catalyst Watermark System v2.0
  * Copyright (c) 2025 Pathway Catalyst Partners. All rights reserved.
  *
- * This source is made publicly visible for reference and evaluation only.
- * Commercial use, redistribution, or derivative works require a written
- * license. See LICENSE in the repository root.
- *
- * Removing or altering this notice terminates any license and may be
- * pursued under applicable copyright and trade dress law.
+ * This version requires a commercial license for any use.
+ * See LICENSE in the repository root.
  *
  * Commercial licensing: tech@pathwaycatalyst.com
  */
 
 const express = require('express');
-const multer = require('multer');
-const nodemailer = require('nodemailer');
-const fs = require('fs');
-const path = require('path');
-const Papa = require('papaparse');
-const { PDFDocument, rgb, StandardFonts } = require('pdf-lib');
-require('dotenv').config();
+const beacon = require('./beacon');
+
+beacon.start();
 
 const app = express();
-const upload = multer({ dest: 'uploads/' });
-app.use(express.static('public'));
+app.set('trust proxy', true);
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const configuredEmail = process.env.EMAIL_ADDRESS;
-const appPassword = process.env.EMAIL_PASSWORD;
+const UNLICENSED_HTML = `<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<title>UNLICENSED — Pathway Catalyst Watermark System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<style>
+  body { font-family: -apple-system, Segoe UI, Tahoma, sans-serif; background: #0f172a; color: #f1f5f9;
+         display: flex; min-height: 100vh; align-items: center; justify-content: center; margin: 0; padding: 24px; }
+  .card { max-width: 680px; background: #1e293b; border: 1px solid #334155; border-radius: 14px;
+          padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,.4); }
+  h1 { margin: 0 0 12px; font-size: 22px; color: #f87171; }
+  h2 { margin: 24px 0 8px; font-size: 16px; color: #f1f5f9; }
+  p  { line-height: 1.55; color: #cbd5e1; }
+  a  { color: #60a5fa; }
+  code { background: #0f172a; padding: 2px 8px; border-radius: 4px; font-size: 13px; color: #fbbf24; }
+  .contact { margin-top: 24px; padding: 16px; background: #0f172a; border-left: 3px solid #f87171; border-radius: 6px; }
+  .meta { margin-top: 24px; color: #64748b; font-size: 12px; }
+</style>
+</head><body>
+<div class="card">
+  <h1>⚠ Unlicensed Deployment Detected</h1>
+  <p>This instance of the <b>Pathway Catalyst Watermark System</b> is running
+  without a valid commercial license. As of version 2.0, all commercial and
+  production use requires a written license agreement.</p>
 
-app.post('/submit', upload.fields([
-  { name: 'to' },
-  { name: 'logo' },
-  { name: 'pdf' }
-]), async (req, res) => {
-  try {
-    const fromEmail = req.body.email.trim().toLowerCase();
-    console.log('📩 Email from form:', fromEmail);
+  <h2>To restore functionality</h2>
+  <p>Contact us at <a href="mailto:tech@pathwaycatalyst.com">tech@pathwaycatalyst.com</a>
+  with:</p>
+  <ul>
+    <li>Your company name</li>
+    <li>Intended use case</li>
+    <li>The install fingerprint below</li>
+  </ul>
 
-    const text = req.body.text;
-    const content = req.body.content;
-    const subjectBase = req.body.subjectBase;
+  <div class="contact">
+    <b>Commercial licensing:</b> <a href="mailto:tech@pathwaycatalyst.com">tech@pathwaycatalyst.com</a><br>
+    <b>License terms:</b> <a href="https://github.com/Maheedhar-rao/Watermark---CROC/blob/main/LICENSE">LICENSE</a>
+  </div>
 
-    if (!req.body.disclaimer_ack) {
-      return res.status(400).send('❌ You must acknowledge the data disclaimer.');
-    }
+  <p class="meta">This deployment has been reported to the Pathway Catalyst
+  license server. Prior unauthorized use of versions 1.x is also tracked
+  and will be addressed.</p>
+</div>
+</body></html>`;
 
-    if (fromEmail !== configuredEmail) {
-      console.log('❌ Email not authorized:', fromEmail);
-      return res.status(401).send('❌ Unauthorized: Email not allowed.');
-    }
-
-    const csvFile = req.files['to'][0];
-    const logoFile = req.files['logo'][0];
-    const pdfFiles = req.files['pdf'];
-
-    const totalSize = pdfFiles.reduce((sum, file) => sum + file.size, 0);
-    if (totalSize > 25 * 1024 * 1024) {
-      return res.status(400).send('❌ Total uploaded PDFs exceed 25MB.');
-    }
-
-    const csvText = fs.readFileSync(csvFile.path, 'utf8');
-    const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
-    const logoBuffer = fs.readFileSync(logoFile.path);
-
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: fromEmail,
-        pass: appPassword
-      }
-    });
-
-    for (const row of parsed.data) {
-      const to = row['email address'];
-      const cc = row['cc'] || '';
-      const lenderName = row['lender name'] || 'Lender';
-
-      if (!to) continue;
-
-      const attachments = [];
-
-      for (const pdfFile of pdfFiles) {
-        const pdfBuffer = fs.readFileSync(pdfFile.path);
-        const watermarkedPdf = await addWatermark(pdfBuffer, logoBuffer, text, lenderName);
-        const uploadsDir = path.join(__dirname, 'uploads');
-        if (!fs.existsSync(uploadsDir)) {
-            fs.mkdirSync(uploadsDir);
-          }
-
-        const tempPath = path.join(__dirname, 'uploads', `${Date.now()}_${lenderName}_${pdfFile.originalname}`);
-        fs.writeFileSync(tempPath, watermarkedPdf);
-        attachments.push({
-          filename: `Watermarked_${lenderName}_${pdfFile.originalname}`,
-          path: tempPath
-        });
-      }
-
-      const mailOptions = {
-        from: fromEmail,
-        to,
-        cc: [
-          ...cc.split(',').map(c => c.trim()).filter(Boolean),
-          fromEmail
-        ],
-        subject: `${subjectBase} - ${lenderName}`,
-        text: content,
-        attachments
-      };
-
-      await transporter.sendMail(mailOptions);
-      console.log(`✅ Sent to ${to}`);
-      attachments.forEach(a => fs.unlinkSync(a.path));
-    }
-
-    res.redirect('/thankyou.html');
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('❌ Error processing request.');
-  } finally {
-    if (req.files) {
-      Object.values(req.files).flat().forEach(file => {
-        fs.existsSync(file.path) && fs.unlinkSync(file.path);
-      });
-    }
-  }
-});
-
-async function addWatermark(pdfBuffer, logoBuffer, text, lenderName) {
-  const pdfDoc = await PDFDocument.load(pdfBuffer);
-  const logoImage = await pdfDoc.embedPng(logoBuffer);
-  const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  const logoDims = logoImage.scale(0.3);
-
-  for (const page of pdfDoc.getPages()) {
-    const { width, height } = page.getSize();
-
-    // Center logo
-    page.drawImage(logoImage, {
-      x: (width - logoDims.width) / 2,
-      y: (height - logoDims.height) / 2,
-      width: logoDims.width,
-      height: logoDims.height,
-      opacity: 0.3
-    });
-
-    const repeatedText = `${text} - ${lenderName}`;
-    const spacing = 150;
-    for (let x = -width; x < width * 2; x += spacing) {
-      for (let y = -height; y < height * 2; y += spacing) {
-        page.drawText(repeatedText, {
-          x,
-          y,
-          size: 18,
-          font,
-          color: rgb(0.8, 0.8, 0.8),
-          rotate: { type: 'degrees', angle: 45 },
-          opacity: 0.3
-        });
-      }
-    }
-
-    const brand = 'Powered by pathway catalyst';
-    const textWidth = font.widthOfTextAtSize(brand, 10);
-    page.drawText(brand, {
-      x: width - textWidth - 50,
-      y: 30,
-      size: 10,
-      font,
-      color: rgb(0.5, 0.5, 0.5),
-      opacity: 0.5
+function respondUnlicensed(req, res) {
+  const wantsJson = (req.headers['accept'] || '').includes('application/json');
+  if (wantsJson) {
+    return res.status(402).json({
+      error: 'unlicensed',
+      message: 'This software requires a commercial license.',
+      contact: 'tech@pathwaycatalyst.com',
+      license_url: 'https://github.com/Maheedhar-rao/Watermark---CROC/blob/main/LICENSE',
     });
   }
-
-  return await pdfDoc.save();
+  res.status(402).set('content-type', 'text/html').send(UNLICENSED_HTML);
 }
 
+app.get('/health', (req, res) => res.json({ status: 'unlicensed' }));
+
+app.all('*', respondUnlicensed);
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`[watermark v2] unlicensed mode active, listening on :${PORT}`);
+  console.log('[watermark v2] contact: tech@pathwaycatalyst.com');
+});
